@@ -1,46 +1,86 @@
-const express = require('express'); 
+// index.js
+const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const EmployeeModel = require('./Model/Employee');
+const bcrypt = require('bcrypt');
+const EmployeeModel = require('./Model/Employee'); // Ensure correct path
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb+srv://chinnag927_db_user:gdsr1234@jwt.yyrfe54.mongodb.net/")
+// ---------- MongoDB Connection ----------
+mongoose.connect(
+  "mongodb+srv://chinnag927_db_user:gdsr1234@jwt.yyrfe54.mongodb.net/jwt"
+)
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.error("MongoDB connection error:", err));
 
-app.post('/login', async (req, res) => {
+// ---------- REGISTER ----------
+app.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await EmployeeModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await EmployeeModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({
+      message: "User registered successfully",
+      userId: newUser._id,
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------- LOGIN ----------
+app.post("/login", async (req, res) => {
+  try {
     const { email, password } = req.body;
 
-    try {
-        const user = await EmployeeModel.findOne({ email }); // only check email
-
-        if (!user) {
-            return res.json({ message: "No record found" });
-        }
-
-        if (user.password !== password) {
-            return res.json({ message: "Invalid Credentials" });
-        }
-
-        return res.json({ message: "Login Successful", user }); // frontend detects success
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Server Error" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
     }
+
+    const user = await EmployeeModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "No record found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+
+    res.json({
+      message: "Login Successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
-
-
-
-app.post('/register', async (req, res) => {
-
-    EmployeeModel.create(req.body)
-    .then(employees=>res.json(employees)) 
-    .catch(err=>res.json(err));
-}) ;
-
-
-app.listen(3000, () => {
-    console.log("Server started on port 3000");
-});
+// ---------- Start Server ----------
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
