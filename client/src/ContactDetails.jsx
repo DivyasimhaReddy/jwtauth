@@ -1,11 +1,13 @@
-// src/ContactDetails.jsx
 import React from 'react';
 import { Link } from "react-router-dom";
+import Navbar from "./Navbar"; // import Navbar
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ContactDetails = () => {
   return (
     <div id="contact" className="container my-5">
+      <Navbar /> {/* Navbar shows Logout */}
+      
       <h2 className="text-center mb-4" style={{ color: '#3E2723' }}>Contact Us</h2>
       <div className="row justify-content-center">
         <div className="col-md-6">
@@ -20,9 +22,9 @@ const ContactDetails = () => {
             <p style={{ color: '#3E2723', fontWeight: '500' }}>
               <strong>Email:</strong> info@classicconstruction.com
             </p>
-            <Link to="/login" className="btn btn-lg"
+            <Link to="/home" className="btn btn-lg"
               style={{ backgroundColor: '#6D4C41', color: '#fff', fontWeight: 'bold', borderRadius: '8px' }}>
-              Login / Enquire
+              Back to Home
             </Link>
           </div>
         </div>
@@ -31,4 +33,4 @@ const ContactDetails = () => {
   );
 };
 
-export default ContactDetails;  // ✅ Make sure this line exists
+export default ContactDetails;

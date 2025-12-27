@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const EmployeeModel = require('./Model/Employee'); // Ensure correct path
+const jwt=require("jsonwebtoken")
+
 
 const app = express();
 app.use(express.json());
@@ -49,38 +51,34 @@ app.post("/register", async (req, res) => {
 });
 
 // ---------- LOGIN ----------
+
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
     const user = await EmployeeModel.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "No record found" });
-    }
+    if (!user) return res.status(400).json({ message: "No record found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid Credentials" });
-    }
+    if (!isMatch) return res.status(400).json({ message: "Invalid Credentials" });
 
-    res.json({
-      message: "Login Successful",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
+    // Only include necessary info in JWT
+    const payload = { userId: user._id };
+    const jwtToken = jwt.sign(payload, "fgfyudgfuydgy", { expiresIn: "1h" });
+
+    // Send token as JSON
+    res.json({ token: jwtToken });
+
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
+
 // ---------- Start Server ----------
-const PORT = 3000;
+const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

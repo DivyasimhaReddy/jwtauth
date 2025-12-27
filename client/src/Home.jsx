@@ -1,10 +1,13 @@
-import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
 import { Link } from "react-router-dom";
+import Navbar from "./Navbar"; // import Navbar
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Home = () => {
   return (
     <div>
+      <Navbar /> {/* Add Navbar at top */}
+
       {/* Hero Section */}
       <div
         className="d-flex flex-column justify-content-center align-items-center text-center"
@@ -94,13 +97,12 @@ const Home = () => {
         <h3 style={{ color: '#b0854f' }}>Ready to Start Your Project?</h3>
         <p style={{ color: '#f5f5f5' }}>Contact us today to make your dream property a reality!</p>
         <Link
-  to="/contact"
-  className="btn btn-lg"
-  style={{ backgroundColor: '#b0854f', color: '#fff', fontWeight: 'bold' }}
->
-  Get in Touch
-</Link>
-
+          to="/contact"
+          className="btn btn-lg"
+          style={{ backgroundColor: '#b0854f', color: '#fff', fontWeight: 'bold' }}
+        >
+          Get in Touch
+        </Link>
       </div>
     </div>
   );

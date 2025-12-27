@@ -1,21 +1,44 @@
-import React from 'react'; // ✅ You must import React
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Login from './Login';
 import Signup from './Signup';
 import Home from './Home';
 import ContactDetails from './ContactDetails';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />  {/* default route */}
+        {/* Redirect / to /login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/contact" element={<ContactDetails />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <ProtectedRoute>
+              <ContactDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all route */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
